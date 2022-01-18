@@ -21,6 +21,7 @@ local SelectedShopArea
 local SelectedQuestArea
 local SelectedStatsUpgrade
 local SelectedChests
+local SelectedPlayerUpgrade
 local char = game.Players.LocalPlayer.Character
 local Eggs = {}
 
@@ -30,6 +31,7 @@ local SellAreas = {}
 local ShopAreas = {}
 local QuestAreas = {}
 local StatsUpgradeAreas = {}
+local BaseStatsUpgradeAreas = {}
 local Chests = {}
 
 local WorldList = {
@@ -98,44 +100,55 @@ for _,AREA in pairs(game:GetService("Workspace").RegionBariers:GetChildren()) do
         table.insert(Areas,AREA)
     end
 end
-local SP,SPP,QP,PLUP,TR = 0,0,0,0,0
+local SP,SPP,QP,PLUP,TR,BG = 0,0,0,0,0,0
 for _,Map in pairs(game:GetService("Workspace").TriggerAreas:GetChildren()) do
+    if Map.Name == "Sell" then
+        for i,v in pairs(Map:GetChildren()) do
+            v.Name = "SellPart"
+        end
+    end
+    if Map.Name.Name == "Shop" then
+        for i,v in pairs(Map:GetChildren()) do
+            v.Name = "ShopPart"
+        end
+    end
+    if Map.Name.Name == "Quest" then
+        for i,v in pairs(Map:GetChildren()) do
+            v.Name = "QuestPart"
+        end
+    end
+    if Map.Name == "PetLevelUp" then
+        for i,v in pairs(Map:GetChildren()) do
+            v.Name = "PetLevelUpPart"
+        end
+    end--BaseStatsUpgradeAreas
+    if Map.Name == "BaseStatsUpgrader" then
+        for i,v in pairs(Map:GetChildren()) do
+            v.Name = "BaseStatsUpgrader"
+        end
+    end
+    if Map.Name == "GroupReward" then
+        for i,v in pairs(Map:GetChildren()) do
+            v.Name = "Trigger"
+        end
+    end
+    if Map.Name == "GroupRewardDiamonds" then
+        for i,v in pairs(Map:GetChildren()) do
+            v.Name = "Trigger"
+        end
+    end
     for _,TriggerPart in pairs(Map:GetChildren()) do
-        if TriggerPart.Parent.Name == "Sell" then
-            for i,v in pairs(TriggerPart.Parent:GetChildren()) do
-                v.Name = "SellPart"
-            end
-        end
-        if TriggerPart.Parent.Name == "Shop" then
-            for i,v in pairs(TriggerPart.Parent:GetChildren()) do
-                v.Name = "ShopPart"
-            end
-        end
-        if TriggerPart.Parent.Name == "Quest" then
-            for i,v in pairs(TriggerPart.Parent:GetChildren()) do
-                v.Name = "QuestPart"
-            end
-        end
-        if TriggerPart.Parent.Name == "PetLevelUp" then
-            for i,v in pairs(TriggerPart.Parent:GetChildren()) do
-                v.Name = "PetLevelUpPart"
-            end
-        end
-        if TriggerPart.Parent.Name == "GroupReward" then
-            for i,v in pairs(TriggerPart.Parent:GetChildren()) do
-                v.Name = "Trigger"
-            end
-        end
-        if TriggerPart.Parent.Name == "GroupRewardDiamonds" then
-            for i,v in pairs(TriggerPart.Parent:GetChildren()) do
-                v.Name = "Trigger"
-            end
-        end
         if TriggerPart.Name == "SellPart" then
             SP+=1
             local _Value_new = SP
             TriggerPart.Name = "SellPart"..tostring(_Value_new)
             table.insert(SellAreas,TriggerPart.Name)
+        end
+        if TriggerPart.Name == "BaseStatsUpgrader" then
+            BG+=1
+            local _Value_new = BG
+            TriggerPart.Name = "BaseStatsUpgrader"..tostring(_Value_new)
+            table.insert(BaseStatsUpgradeAreas,TriggerPart.Name)
         end
         if TriggerPart.Name == "ShopPart" then
             SPP+=1
@@ -188,8 +201,12 @@ t:Dropdown("Quest Areas",QuestAreas,true,function(a)
 	SelectedQuestArea = a
 end)
 
-t:Dropdown("Stats Upgrade Area",StatsUpgradeAreas,true,function(a)
+t:Dropdown("Stats Upgrade Areas",StatsUpgradeAreas,true,function(a)
 	SelectedStatsUpgrade = a
+end)
+
+t:Dropdown("Player Upgrade Areas",BaseStatsUpgradeAreas,true,function(a)
+	SelectedPlayerUpgrade = a
 end)
 
 t:Dropdown("Group Rewards",Chests,true,function(a)
@@ -222,6 +239,12 @@ end)
 t:Button("Teleport to Pet Upgrade",function()
 	local SA = "PetLevelUp"
     local _Type = SelectedStatsUpgrade
+    char.HumanoidRootPart.CFrame = CFrame.new(game:GetService("Workspace").TriggerAreas[SA][_Type].CFrame.Position + Vector3.new(1,2,0))
+end)
+
+t:Button("Teleport to Player Upgrade",function()
+	local SA = "BaseStatsUpgrader"
+    local _Type = SelectedPlayerUpgrade
     char.HumanoidRootPart.CFrame = CFrame.new(game:GetService("Workspace").TriggerAreas[SA][_Type].CFrame.Position + Vector3.new(1,2,0))
 end)
 
