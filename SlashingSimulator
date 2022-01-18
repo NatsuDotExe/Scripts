@@ -1,0 +1,400 @@
+local library = loadstring(game:HttpGet(('https://raw.githubusercontent.com/Maxgat5/UiLib/main/lua')))()
+local HTTP = game:GetService("HttpService")
+local w = library:CreateWindow("Slashing Simulator ⚔")
+local b = w:CreateFolder("AutoFarm")
+local g = w:CreateFolder("AutoBuy")
+local m = w:CreateFolder("Misc")
+local t = w:CreateFolder("Teleports")
+local SelectedWorld = "Spawn"
+local SelectedEgg = "BasicEgg"
+local AutoSlice
+local AutoSell
+local AutoBuyEggsGems
+local AutoBuyEggsCoins
+local AutoBuyEggsRobux
+local AutoSliceAll
+local AutoFarmBosses
+local AutoBuyAreas
+local OpenAllAreas
+local SelectedSellArea
+local SelectedShopArea
+local SelectedQuestArea
+local SelectedStatsUpgrade
+local SelectedChests
+local char = game.Players.LocalPlayer.Character
+local Eggs = {}
+
+local Areas = {}
+
+local SellAreas = {}
+local ShopAreas = {}
+local QuestAreas = {}
+local StatsUpgradeAreas = {}
+local Chests = {}
+
+local WorldList = {
+    "Spawn",
+    "Medival Madness",
+    "Snow Fields",
+    "Candy Paradise",
+    "Lavafall",
+    "Aqua",
+    "Graveyard",
+}
+
+local Bosses = {
+    "Muzan",
+    "MrFreeze",
+    "Canal",
+    "TheUniverse"
+}
+
+local WorldObjects = {
+    ["Spawn"] = {
+        "Tree",
+        "TreeTrunk",
+        "Rock",
+    },
+    ["Medival Madness"] = {
+        "CanonLauncher",
+        "Barrel",
+        "Shield",
+    },
+    ["Snow Fields"] = {
+        "SnowMan",
+        "SnowTree",
+        "GlacierRock",
+    },
+    ["Candy Paradise"] = {
+        "CandyCane",
+        "Lollipop",
+        "RoundCandy",
+    },
+    ["Lavafall"] = {
+        "Volcano",
+        "Skeleton",
+        "LavaRock",
+    },
+    ["Aqua"] = {
+        "Fish",
+        "Anchor",
+        "Starfish",
+    },
+    ["Graveyard"] = {
+        "Zombie",
+        "SpookyTree",
+        "Gravestone",
+    },
+}
+
+for _,EGG in pairs(game:GetService("Workspace").EggStands:GetChildren()) do
+    if not table.find(Eggs,EGG.Name) then
+        table.insert(Eggs,EGG.Name)
+    end
+end
+
+for _,AREA in pairs(game:GetService("Workspace").RegionBariers:GetChildren()) do
+    if not table.find(Areas,AREA) then
+        table.insert(Areas,AREA)
+    end
+end
+local SP,SPP,QP,PLUP,TR = 0,0,0,0,0
+for _,Map in pairs(game:GetService("Workspace").TriggerAreas:GetChildren()) do
+    for _,TriggerPart in pairs(Map:GetChildren()) do
+        if TriggerPart.Parent.Name == "Sell" then
+            for i,v in pairs(TriggerPart.Parent:GetChildren()) do
+                v.Name = "SellPart"
+            end
+        end
+        if TriggerPart.Parent.Name == "Shop" then
+            for i,v in pairs(TriggerPart.Parent:GetChildren()) do
+                v.Name = "ShopPart"
+            end
+        end
+        if TriggerPart.Parent.Name == "Quest" then
+            for i,v in pairs(TriggerPart.Parent:GetChildren()) do
+                v.Name = "QuestPart"
+            end
+        end
+        if TriggerPart.Parent.Name == "PetLevelUp" then
+            for i,v in pairs(TriggerPart.Parent:GetChildren()) do
+                v.Name = "PetLevelUpPart"
+            end
+        end
+        if TriggerPart.Parent.Name == "GroupReward" then
+            for i,v in pairs(TriggerPart.Parent:GetChildren()) do
+                v.Name = "Trigger"
+            end
+        end
+        if TriggerPart.Parent.Name == "GroupRewardDiamonds" then
+            for i,v in pairs(TriggerPart.Parent:GetChildren()) do
+                v.Name = "Trigger"
+            end
+        end
+        if TriggerPart.Name == "SellPart" then
+            SP+=1
+            local _Value_new = SP
+            TriggerPart.Name = "SellPart"..tostring(_Value_new)
+            table.insert(SellAreas,TriggerPart.Name)
+        end
+        if TriggerPart.Name == "ShopPart" then
+            SPP+=1
+            local _Value_new = SPP
+            TriggerPart.Name = "ShopPart"..tostring(_Value_new)
+            table.insert(ShopAreas,TriggerPart.Name)
+        end
+
+        if TriggerPart.Name == "QuestPart" then
+            QP+=1
+            local _Value_new = QP
+            TriggerPart.Name = "QuestPart"..tostring(_Value_new)
+            table.insert(QuestAreas,TriggerPart.Name)
+        end
+
+        if TriggerPart.Name == "PetLevelUpPart" then
+            PLUP+=1
+            local _Value_new = PLUP
+            TriggerPart.Name = "PetLevelUpPart"..tostring(_Value_new)
+            table.insert(StatsUpgradeAreas,TriggerPart.Name)
+        end
+
+        if TriggerPart.Name == "Trigger" then
+            TR+=1
+            local _Value_new = TR
+            TriggerPart.Name = "Trigger"..tostring(_Value_new)
+            table.insert(Chests,TriggerPart.Name)
+        end
+    end
+end
+
+t:Button("Open All Areas",function()
+    pcall(function()
+        for i,v in pairs(game:GetService("Workspace").RegionBariers:GetChildren()) do
+            v.Transparency = 1
+            v.CanCollide = false
+        end
+    end)
+end)
+
+t:Dropdown("Sell Areas",SellAreas,true,function(a)
+	SelectedSellArea = a
+end)
+
+t:Dropdown("Shop Areas",ShopAreas,true,function(a)
+	SelectedShopArea = a
+end)
+
+t:Dropdown("Quest Areas",QuestAreas,true,function(a)
+	SelectedQuestArea = a
+end)
+
+t:Dropdown("Stats Upgrade Area",StatsUpgradeAreas,true,function(a)
+	SelectedStatsUpgrade = a
+end)
+
+t:Dropdown("Group Rewards",Chests,true,function(a)
+	SelectedChests = a
+end)
+
+--u:Button("Discord Server",function()
+--	setclipboard(getgenv().Discord)
+--end)
+
+t:Button("Teleport to Sell",function()
+    print(SelectedSellArea, typeof(SelectedSellArea))
+    local SA = "Sell"
+    local _Type = SelectedSellArea
+    char.HumanoidRootPart.CFrame = CFrame.new(game:GetService("Workspace").TriggerAreas[SA][_Type].CFrame.Position + Vector3.new(1,2,0))
+end)
+
+t:Button("Teleport to Shop",function()
+	local SA = "Shop"
+    local _Type = SelectedShopArea
+    char.HumanoidRootPart.CFrame = CFrame.new(game:GetService("Workspace").TriggerAreas[SA][_Type].CFrame.Position + Vector3.new(1,2,0))
+end)
+
+t:Button("Teleport to Quest",function()
+	local SA = "Quest"
+    local _Type = SelectedQuestArea
+    char.HumanoidRootPart.CFrame = CFrame.new(game:GetService("Workspace").TriggerAreas[SA][_Type].CFrame.Position + Vector3.new(1,2,0))
+end)
+
+t:Button("Teleport to Pet Upgrade",function()
+	local SA = "PetLevelUp"
+    local _Type = SelectedStatsUpgrade
+    char.HumanoidRootPart.CFrame = CFrame.new(game:GetService("Workspace").TriggerAreas[SA][_Type].CFrame.Position + Vector3.new(1,2,0))
+end)
+
+t:Button("Teleport to Group Reward",function()
+	local SA
+    local _Type = SelectedChests
+    if _Type == "Trigger1" then
+        SA = "GroupReward"
+        char.HumanoidRootPart.CFrame = CFrame.new(game:GetService("Workspace").TriggerAreas[SA][_Type].CFrame.Position + Vector3.new(1,2,0))
+    end
+
+    if _Type == "Trigger2" then
+        SA = "GroupRewardDiamonds"
+        char.HumanoidRootPart.CFrame = CFrame.new(game:GetService("Workspace").TriggerAreas[SA][_Type].CFrame.Position + Vector3.new(1,2,0))
+    end
+end)
+
+g:Toggle("Auto Buy Areas",function(bool)
+	shared.toggle = bool
+	AutoBuyAreas = bool
+end)
+
+g:Dropdown("Select Egg",Eggs,true,function(egg)
+	SelectedEgg = egg
+end)
+
+g:Toggle("Auto Buy Egg Robux",function(bool)
+	shared.toggle = bool
+	AutoBuyEggsRobux = bool
+end)
+
+g:Toggle("Auto Buy Egg Coins",function(bool)
+	shared.toggle = bool
+	AutoBuyEggsCoins = bool
+end)
+
+g:Toggle("Auto Buy Egg Gems",function(bool)
+	shared.toggle = bool
+	AutoBuyEggsGems = bool
+end)
+
+b:Dropdown("Select World",WorldList,true,function(a)
+	SelectedWorld = a
+end)
+
+b:Toggle("Auto Farm World",function(bool)
+	shared.toggle = bool
+	AutoSlice = bool
+end)
+
+b:Toggle("Auto Farm All",function(bool)
+	shared.toggle = bool
+	AutoSliceAll = bool
+end)
+
+b:Toggle("Auto Farm Bosses",function(bool)
+	shared.toggle = bool
+	AutoSlice = bool
+end)
+
+b:Toggle("Auto Sell",function(bool)
+	shared.toggle = bool
+	AutoSell = bool
+end)
+
+while wait() do
+    spawn(function()
+        if AutoSlice == true then
+            pcall(function()
+                if WorldObjects[tostring(SelectedWorld)] then
+                    for _,WorldObject in pairs(WorldObjects[tostring(SelectedWorld)]) do
+                        for _,ObjectFolder in pairs(game.Workspace.SlicableObjects:GetChildren()) do
+                            for index,Object in pairs(ObjectFolder:GetChildren()) do
+                                if Object.Name == WorldObject then
+                                    game:GetService("ReplicatedStorage").Remotes.Slicers.FondInstinct:FireServer("Slice",Object.SLICEDPART,{["sliceStartPoint"] = game.Players.LocalPlayer.Character:FindFirstChildOfClass("Tool").Handle.Position,["Dir"] = (game.Players.LocalPlayer.Character:FindFirstChildOfClass("Tool").Handle.Position - Object.SLICEDPART.Position),["Size"] = Vector3.new(1,1,1),["CFrame"] = game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame,["sliceEndPoint"] = Object.SLICEDPART.Position,["N"] = 1})
+                                end
+                            end
+                        end
+                    end
+                end
+            end)
+        end
+    end)
+
+    spawn(function()
+        if AutoBuyAreas == true then
+            pcall(function()
+                for _,Area in pairs(workspace.RegionBaries:GetChildren()) do
+                    game:GetService("ReplicatedStorage").Remotes.Game.UnlockArea:InvokeServer(Area)
+                end
+            end)
+        end
+    end)
+
+    spawn(function()
+        if AutoFarmBosses == true then
+            pcall(function()
+                for _,Boss in pairs(Bosses) do
+                    for _,ObjectFolder in pairs(game.Workspace.SlicableObjects:GetChildren()) do
+                        for index,Object in pairs(ObjectFolder:GetChildren()) do
+                            if Object.Name == Boss then
+                                game:GetService("ReplicatedStorage").Remotes.Slicers.FondInstinct:FireServer("Slice",Object.Head,{["sliceStartPoint"] = game.Players.LocalPlayer.Character:FindFirstChildOfClass("Tool").Handle.Position,["Dir"] = (game.Players.LocalPlayer.Character:FindFirstChildOfClass("Tool").Handle.Position - Object.Head.Position),["Size"] = Vector3.new(1,1,1),["CFrame"] = game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame,["sliceEndPoint"] = Object.Head.Position,["N"] = 1})
+                            end
+                        end
+                    end
+                end
+            end)
+        end
+    end)
+
+    spawn(function()
+        if AutoSliceAll == true then
+            pcall(function()
+                for _,ObjectFolder in pairs(game.Workspace.SlicableObjects:GetChildren()) do
+                    for index,Object in pairs(ObjectFolder:GetChildren()) do
+                        game:GetService("ReplicatedStorage").Remotes.Slicers.FondInstinct:FireServer("Slice",Object.SLICEDPART,{["sliceStartPoint"] = game.Players.LocalPlayer.Character:FindFirstChildOfClass("Tool").Handle.Position,["Dir"] = (game.Players.LocalPlayer.Character:FindFirstChildOfClass("Tool").Handle.Position - Object.SLICEDPART.Position),["Size"] = Vector3.new(1,1,1),["CFrame"] = game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame,["sliceEndPoint"] = Object.SLICEDPART.Position,["N"] = 1})
+                    end
+                end
+            end)
+        end
+    end)
+
+    spawn(function()
+        if AutoBuyEggsGems == true then
+            pcall(function()
+                game:GetService("ReplicatedStorage").Remotes.Pets.Eggs.HatchEgg:FireServer(tostring(SelectedEgg),"Diamonds")
+            end)
+        end
+    end)
+
+    spawn(function()
+        if AutoBuyEggsRobux == true then
+            pcall(function()
+                game:GetService("ReplicatedStorage").Remotes.Pets.Eggs.HatchEgg:FireServer(tostring(SelectedEgg),"Robux")
+            end)
+        end
+    end)
+
+    spawn(function()
+        if AutoBuyEggsCoins == true then
+            pcall(function()
+                game:GetService("ReplicatedStorage").Remotes.Pets.Eggs.HatchEgg:FireServer(tostring(SelectedEgg),"Coins")
+            end)
+        end
+    end)
+
+    spawn(function()
+        if AutoSell == true then
+            pcall(function()
+                game:GetService("ReplicatedStorage").Postie.Sent:FireServer("TriggerArea",string.upper(HTTP:GenerateGUID(false)),"Sell")
+            end)
+        end
+    end)
+end
+--local f = w:CreateFolder("AutoBuy")
+--local e = w:CreateFolder("Mix")
+--local u = w:CreateFolder("Credits")
+
+--f:Dropdown("Select PowerCrate",PowerCrates,true,function(a)
+--	SelectedPowerCrate = a
+--end)
+
+--f:Toggle("PowerCrate",function(bool)
+--	shared.toggle = bool
+--	PowerCrate = bool
+--end)
+
+--u:Label("Pastebin Views: "..getgenv().TotalPastebinViews,{
+--	TextSize = 25;
+--	TextColor = Color3.fromRGB(255,255,255);
+--	BgColor = Color3.fromRGB(69,69,69)
+--})
+
+--u:Button("Discord Server",function()
+--	setclipboard(getgenv().Discord)
+--end)
