@@ -296,7 +296,7 @@ while wait() do
                         for _,ObjectFolder in pairs(game.Workspace.SlicableObjects:GetChildren()) do
                             for index,Object in pairs(ObjectFolder:GetChildren()) do
                                 if Object.Name == WorldObject then
-                                    game:GetService("ReplicatedStorage").Remotes.Slicers.FondInstinct:FireServer("Slice",Object.SLICEDPART,{["sliceStartPoint"] = game.Players.LocalPlayer.Character:FindFirstChildOfClass("Tool").Handle.Position,["Dir"] = (game.Players.LocalPlayer.Character:FindFirstChildOfClass("Tool").Handle.Position - Object.SLICEDPART.Position),["Size"] = Vector3.new(1,1,1),["CFrame"] = game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame,["sliceEndPoint"] = Object.SLICEDPART.Position,["N"] = 1})
+                                    game:GetService("ReplicatedStorage").Remotes.Slicers.FondInstinct:FireServer("Slice",Object.SLICEDPART,{["sliceStartPoint"] = game.Players.LocalPlayer.Character:FindFirstChildOfClass("Tool").Handle.Position,["Dir"] = (game.Players.LocalPlayer.Character:FindFirstChildOfClass("Tool").Handle.Position - Object.SLICEDPART.Position),["Size"] = Vector3.new(1,1,1),["CFrame"] = game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame,["sliceEndPoint"] = Object.SLICEDPART.Position,["N"] = 2})
                                 end
                             end
                         end
