@@ -1,0 +1,154 @@
+local RunService = game:GetService("RunService")
+local Profiles = game:GetService("Workspace").Profiles
+local Orbs
+local library = loadstring(game:HttpGet(('https://raw.githubusercontent.com/Maxgat5/UiLib/main/lua')))()
+local HTTP = game:GetService("HttpService")
+local w = library:CreateWindow("TikBlok Simulator")
+local af = w:CreateFolder("Auto Farms")
+local teleport = w:CreateFolder("Teleports")
+local misc = w:CreateFolder("Misc")
+local credits = w:CreateFolder("Credits")
+local GetZones = require(game:GetService("ReplicatedStorage").Modules.ZoneInfo)
+local Zones = {}
+for i,v in pairs(GetZones:GetZones()) do
+    print(i,v)
+    if not table.find(Zones,""..i) then
+        table.insert(Zones, ""..i)
+    end
+end
+local Phones = {
+    [1] = "IPhone Pro Max",
+    [2] = "2000s Flip Phone",
+    [3] = "Brick Phone",
+    [4] = "Retro Phone",
+    [5] = "Double Phone",
+    [6] = "Fire Phone",
+    [7] = "Cracked Phone",
+    [8] = "Pizza Phone",
+    [9] = "Ice Phone",
+    [10] = "Retro Phone 2",
+    [11] = "Spider Phone",
+    [12] = "Retro Eye Phone",
+    [13] = "Glitch Phone",
+    [14] = "VR Phone",
+    [15] = "Hologram Phone",
+}
+local SelectedZone,SelectedEgg,SelectedZoneTP,AutoBuyPhones = "Melody Way","Melodic Egg","Melody Way"
+local Eggs = {
+    "Tune Star Egg",
+    "Melodic Egg",
+    "Blazing Beat Egg",
+    "Fire Egg"
+}
+local char
+local AutoCollectDrops,AutoRecord,AutoBuyEgg
+
+RunService.Stepped:Connect(function()
+    spawn(function()
+        char = game.Players.LocalPlayer.Character
+    end)
+end)
+teleport:Button("Teleport to PhoneShop",function()
+    pcall(function()
+        char.HumanoidRootPart.CFrame = CFrame.new(game:GetService("Workspace").PhoneShop.Entrance.CFrame.Position + Vector3.new(1,2,0))
+    end)
+end)
+
+teleport:Dropdown("Zones",Zones,true,function(a)
+    pcall(function()
+        SelectedZoneTP = a
+    end)
+end)
+
+teleport:Button("Teleport to Zone Spawn",function()
+    pcall(function()
+        char.HumanoidRootPart.CFrame = CFrame.new(game:GetService("Workspace").Zones[SelectedZoneTP].Spawn.CFrame.Position + Vector3.new(1,2,0))
+    end)
+end)
+
+misc:Button("Redeem Code RELEASE",function()
+    pcall(function()
+        game:GetService("ReplicatedStorage").Functions.RedeemCode:InvokeServer("RELEASE")
+    end)
+end)
+
+af:Dropdown("Zones",Zones,true,function(a)
+    pcall(function()
+        SelectedZone = a
+    end)
+end)
+
+af:Dropdown("Eggs",Eggs,true,function(a)
+    pcall(function()
+        SelectedEgg = a
+    end)
+end)
+
+    --u:Button("Discord Server",function()
+    --	setclipboard(getgenv().Discord)
+    --end)
+
+credits:Label("Created By: FondInstinct",{
+    TextSize = 25;
+    TextColor = Color3.fromRGB(153, 0, 255);
+    BgColor = Color3.fromRGB(76, 0, 255)
+})
+
+af:Toggle("Auto Record",function(bool)
+    shared.toggle = bool
+    AutoRecord = bool
+end)
+
+af:Toggle("Auto Collect Drops",function(bool)
+    shared.toggle = bool
+    AutoCollectDrops = bool
+end)
+
+af:Toggle("Auto Buy Egg",function(bool)
+    shared.toggle = bool
+    AutoBuyEgg = bool
+end)
+
+af:Toggle("Auto Buy Phones",function(bool)
+    shared.toggle = bool
+    AutoBuyPhones = bool
+end)
+
+RunService.Stepped:Connect(function()
+    spawn(function()
+        if AutoRecord == true then
+            pcall(function()
+                Orbs = game:GetService("Workspace").Zones[SelectedZone].Orbs
+                for _,Orb in pairs(Orbs:GetChildren()) do
+                    game:GetService("ReplicatedStorage").Functions.Record:InvokeServer(tostring(Orb.Name),SelectedZone)
+                end
+            end)
+        end
+
+        if AutoBuyPhones == true then
+            local PhoneModule = require(game:GetService("ReplicatedStorage").Modules.PhoneInfo)
+            local Data = game:GetService("Players").LocalPlayer.PlayerData.StatsFolder.Cash
+            --Might take a while
+            for Index,Value in pairs(Phones) do
+                if Data.Value >= PhoneModule.GetStats(Value)["Price"] then
+                    print(PhoneModule.GetStats(Value)["Price"])
+                    game:GetService("ReplicatedStorage").Functions.PurchasePhone:InvokeServer(Value)
+                end
+            end
+        end
+
+        if AutoBuyEgg == true then
+            pcall(function()
+                game:GetService("ReplicatedStorage").Events.HatchEggs:FireServer("One",SelectedZone,workspace.Zones[SelectedZone].Eggs[SelectedEgg])
+            end)
+        end
+
+        if AutoCollectDrops == true then
+            pcall(function()
+                for _,Drop in pairs(Profiles:GetChildren()) do
+                    firetouchinterest(game.Players.LocalPlayer.Character.HumanoidRootPart, Drop,0)
+                end
+            end)
+        end
+    end)
+end)
