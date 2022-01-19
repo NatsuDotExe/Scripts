@@ -377,7 +377,6 @@ local WorldObjects = {
             if AutoFarmBosses == true then
                 pcall(function()
                     for INDEX,Boss in pairs(Bosses) do
-                        Boss = Bosses[INDEX]
                         for _,ObjectFolder in pairs(game.Workspace.SlicableObjects:GetChildren()) do
                             if ObjectFolder.Name == Boss then
                                 for index,Object in pairs(ObjectFolder:GetChildren()) do
