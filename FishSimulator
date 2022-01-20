@@ -1,0 +1,184 @@
+--game:GetService("ReplicatedStorage").Events.Game.Bubble:FireServer(workspace.Worlds["Krakens Lair"].Bubbles.Medium)
+local Bubbles
+local RunService = game:GetService("RunService")
+local library = loadstring(game:HttpGet(('https://raw.githubusercontent.com/Maxgat5/UiLib/main/lua')))()
+local HTTP = game:GetService("HttpService")
+local w = library:CreateWindow("Fish Simulator")
+local af = w:CreateFolder("Auto Farms")
+local teleport = w:CreateFolder("Teleports")
+local misc = w:CreateFolder("Misc")
+local credits = w:CreateFolder("Credits")
+local Zones = {}
+local Spawns = {}
+local Players = {}
+for i,v in pairs(game:GetService("Workspace").Worlds:GetChildren()) do
+    print(i,v)
+    if not table.find(Zones,""..v.Name) then
+        table.insert(Zones, ""..v.Name)
+    end
+end
+local SpawnNumb = 0
+for _,Spawn in pairs(game:GetService("Workspace").Spawns:GetChildren()) do
+    if Spawn.Name ~= "Spawn" then
+        Spawn.Name = "Spawn"
+    end
+    if Spawn.Name == "Spawn" then
+        SpawnNumb += 1
+        Spawn.Name = "Spawn"..tostring(SpawnNumb)
+        if not table.find(Spawns,""..Spawn.Name) then
+            table.insert(Spawns, ""..Spawn.Name)
+        end
+    end
+end
+
+for _,Player in pairs(game:GetService("Workspace").Players:GetChildren()) do
+    if not table.find(Players,""..Player.Name) then
+        table.insert(Players, ""..Player.Name)
+    end
+end
+
+game.Players.PlayerAdded:Connect(function(player)
+    if not table.find(Players,""..player.Name) then
+        table.insert(Players, ""..player.Name)
+    end
+end)
+
+game.Players.PlayerRemoving:Connect(function(player)
+    if not table.find(Players,""..player.Name) then
+        for i,v in pairs(Players) do
+            if v == player.Name then
+                table.remove(Players,i)
+            end
+        end
+    end
+end)
+
+local SelectedZone,SelectedEggZone,SelectedSpawn,SelectedPlayer,SelectedBubbleType = "Coral Reef","Coral Reef","Spawn1","Small"
+local char
+local AutoBubble,AutoHatch,OnlyPopChosen
+
+RunService.Stepped:Connect(function()
+    spawn(function()
+        char = game:GetService("Workspace").Players[game.Players.LocalPlayer.Name]
+    end)
+end)
+
+misc:Button("Redeem Codes",function()
+    pcall(function()
+        game:GetService("ReplicatedStorage").Events.Player.Code:FireServer("APOCALYPSE")
+        game:GetService("ReplicatedStorage").Events.Player.Code:FireServer("FISHSQUAD")
+        game:GetService("ReplicatedStorage").Events.Player.Code:FireServer("WOOHOOLIKES")
+        game:GetService("ReplicatedStorage").Events.Player.Code:FireServer("RELEASE")
+    end)
+end)
+
+af:Dropdown("Worlds",Zones,true,function(a)
+    pcall(function()
+        SelectedZone = a
+    end)
+end)
+
+    --u:Button("Discord Server",function()
+    --	setclipboard(getgenv().Discord)
+    --end)
+
+credits:Label("Created By: FondInstinct",{
+    TextSize = 25;
+    TextColor = Color3.fromRGB(153, 0, 255);
+    BgColor = Color3.fromRGB(76, 0, 255)
+})
+local Label = "Discord Server"
+credits:Button(Label,function()
+    pcall(function()
+        if Label == "Discord Server" then
+            setclipboard("https://discord.gg/637b9uA7fE")
+        end
+    end)
+end)
+
+af:Dropdown("Bubble Types",{"Small","Medium","Large"},true,function(a)
+    pcall(function()
+        SelectedBubbleType = a
+    end)
+end)
+
+af:Toggle("Auto Bubble Pop",function(bool)
+    shared.toggle = bool
+    AutoBubble = bool
+end)
+
+af:Toggle("Only Pop Type",function(bool)
+    shared.toggle = bool
+    OnlyPopChosen = bool
+end)
+
+af:Dropdown("Egg World",Zones,true,function(a)
+    pcall(function()
+        SelectedEggZone = a
+    end)
+end)
+
+af:Toggle("Auto Hatch World",function(bool)
+    shared.toggle = bool
+    AutoHatch = bool
+end)
+
+teleport:Button("Teleport to Hub",function()
+    pcall(function()
+        char:SetPrimaryPartCFrame(CFrame.new(Vector3.new(0.405009, 212.078, -2.63253)))
+    end)
+end)
+
+teleport:Dropdown("Players",Players,true,function(a)
+    pcall(function()
+        SelectedPlayer = a
+    end)
+end)
+
+
+teleport:Button("Teleport to Player",function()
+    pcall(function()
+        char:SetPrimaryPartCFrame(game:GetService("Workspace").Players[SelectedPlayer].PrimaryPart.CFrame)
+    end)
+end)
+
+teleport:Dropdown("Hub Spawn Points",Spawns,true,function(a)
+    pcall(function()
+        SelectedSpawn = a
+    end)
+end)
+
+teleport:Button("Teleport to Spawn Point",function()
+    pcall(function()
+        char:SetPrimaryPartCFrame(game:GetService("Workspace").Spawns[SelectedSpawn].CFrame)
+    end)
+end)
+
+--game:GetService("Workspace").Players[game.Players.LocalPlayer.Name]:SetPrimaryPartCFrame()
+RunService.Stepped:Connect(function()
+    spawn(function()
+        if AutoBubble == true then
+            pcall(function()
+                Bubbles = game:GetService("Workspace").Worlds[SelectedZone].Bubbles
+                local Bubble
+                for _,Value in pairs(Bubbles:GetChildren()) do
+                    Bubble = Value
+                end
+                game:GetService("ReplicatedStorage").Events.Game.Bubble:FireServer(Bubbles[Bubble.Name])
+                --print(Bubble, false)
+                if OnlyPopChosen == true then
+                    game:GetService("ReplicatedStorage").Events.Game.Bubble:FireServer(Bubbles[SelectedBubbleType])
+                end
+            end)
+        end
+        if AutoHatch == true then
+            pcall(function()
+                for _,Egg in pairs(workspace.Worlds[SelectedEggZone].Dispensers:GetChildren()) do
+                    if Egg.Name == "EggDispenser" then
+                        game:GetService("ReplicatedStorage").Events.Game.Egg:FireServer(Egg,false)
+                    end
+                end
+            end)
+        end
+    end)
+end)
